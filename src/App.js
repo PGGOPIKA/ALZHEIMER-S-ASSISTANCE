@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { SettingsProvider } from './SettingsContext';
 import Login from './Login';
@@ -44,6 +44,22 @@ function MainAppLayout({ onLogout }) {
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
+
+  // Fetch from Glitch backend after login
+  useEffect(() => {
+    if (loggedIn) {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://plaid-calico-silk.glitch.me';
+
+      fetch(`${backendUrl}/api/sensor-data`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('Fetched sensor data from backend:', data);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch sensor data:', err);
+        });
+    }
+  }, [loggedIn]);
 
   return (
     <SettingsProvider>
